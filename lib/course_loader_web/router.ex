@@ -1,11 +1,9 @@
 defmodule CourseLoaderWeb.Router do
   use CourseLoaderWeb, :router
 
-  pipeline :api do
-    plug :accepts, ["json"]
-  end
+  forward("/api", Absinthe.Plug, schema: CourseLoaderWeb.GraphQL.Schema)
 
-  scope "/api", CourseLoaderWeb do
-    pipe_through :api
+  if Mix.env() == :dev do
+    forward("/graphiql", Absinthe.Plug.GraphiQL, schema: CourseLoaderWeb.GraphQL.Schema)
   end
 end
