@@ -5,12 +5,14 @@ defmodule CourseLoader.Courses do
     CourseLoader.Repo.all(CourseLoader.Courses.Course)
   end
 
-  def count_course_enrolments(%{id: id}, enrolment_type) do
+  def count_course_enrolments(enrolment_type, course_ids) do
     from(
       e in CourseLoader.Courses.Enrolment,
-      select: count(e.course_id),
-      where: e.course_id == ^id and e.type == ^enrolment_type
+      select: {e.course_id, count(e.course_id)},
+      group_by: e.course_id,
+      where: e.course_id in ^course_ids and e.type == ^enrolment_type
     )
-    |> CourseLoader.Repo.one()
+    |> CourseLoader.Repo.all()
+    |> Enum.into(%{})
   end
 end
